@@ -5,8 +5,6 @@ commands:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
       # Add parameter here
-#      workflowid:
-#        type: string
     steps:
       - run:
           name: Destroy environments
@@ -189,7 +187,10 @@ jobs:
           name: Add back-end ip to ansible inventory
           command: |
             # Your code here
-            exit 1
+            aws ec2 describe-instances \
+               --filters Name=tag-value,Values="backend-${CIRCLE_WORKFLOW_ID}" \
+               --query 'Reservations[*].Instances[*].PublicIpAddress' \
+               --output text >> project/.circleci/ansible/inventory.txt
       - persist_to_workspace:
           root: ~/
           paths:
@@ -197,26 +198,33 @@ jobs:
 #      - destroy_environment
 #          workflowid: $CIRCLE_WORKFLOW_ID
 
-#
-#  configure-infrastructure:
-#    docker:
-#      # Docker image here that supports Ansible
-#    steps:
-#      # Checkout code from git
-#      # Add ssh keys with fingerprint
-#      # attach workspace
-#      - run:
-#          name: Install dependencies
-#          command: |
-#            # Your code here
-#            exit 1
-#      - run:
-#          name: Configure server
-#          command: |
-#            # Your code here
-#            exit 1
-#      # Here's where you will add some code to rollback on failure
-#
+
+  configure-infrastructure:
+    docker:
+      # Docker image here that supports Ansible
+      - image: python:3.7-alpine3.11
+    steps:
+      # Checkout code from git
+      - checkout
+      # Add ssh keys with fingerprint
+      - add_ssh_keys:
+          # You can get this ID in the section where you registered the SSH Key
+          fingerprints: ["9b:80:74:3d:eb:a1:02:05:5d:e4:51:d2:74:d2:e9:9c"]
+      # attach workspace
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            # Your code here
+            exit 1
+      - run:
+          name: Configure server
+          command: |
+            # Your code here
+            exit 1
+      # Here's where you will add some code to rollback on failure
+
 #  run-migrations:
 #    docker:
 #      # Docker image here that supports NodeJS
