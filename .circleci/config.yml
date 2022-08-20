@@ -221,9 +221,9 @@ jobs:
             unzip awscliv2.zip
             sudo ./aws/install
       - run:
+          # Install Ansible
           name: Install Ansible
           command: |
-            # Install Ansible
 #            apk add --update ansible
             sudo apt update
             sudo apt install software-properties-common -y
