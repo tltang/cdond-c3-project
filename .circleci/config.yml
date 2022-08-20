@@ -224,7 +224,11 @@ jobs:
           name: Install dependencies/Ansible
           command: |
             # Install Ansible
-            apk add --update ansible
+#            apk add --update ansible
+            sudo apt update
+            sudo apt install software-properties-common -y
+            sudo add-apt-repository --yes --update ppa:ansible/ansible
+            sudo apt install ansible -y
       - run:
           name: Configure server
           command: |
