@@ -383,29 +383,42 @@ jobs:
             ansible-playbook -i inventory.txt deploy-backend.yml
       - destroy_environment
 #      - revert-migrations
-#
-#  smoke-test:
-#    docker:
-#      # Lightweight Docker image
-#    steps:
-#      # Checkout code from git
-#      - run:
-#          name: Install dependencies
-#          command: |
-#            # your code here
+
+  smoke-test:
+    docker:
+      - image: cimg/node:13.8.0
+    steps:
+      # Checkout code from git
+      - checkout
+      - install_awscli
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            # your code here
+            cat frontend/.env
 #      - run:
 #          name: Get backend url
 #          command: |
 #            # your code here
-#      - run:
-#          name: Backend smoke test.
-#          command: |
-#            # your code here
-#      - run:
-#          name: Frontend smoke test.
-#          command: |
-#            # your code here
-#      # Here's where you will add some code to rollback on failure
+#            export BACKEND_IP=$(aws ec2 describe-instances \
+#               --filters Name=tag-value,Values="backend-${CIRCLE_WORKFLOW_ID}" \
+#               --query 'Reservations[*].Instances[*].PublicIpAddress' \
+#               --output text)
+#            export API_URL="http://${BACKEND_IP}:3030"
+#            echo "${API_URL}"
+#            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+#            cat frontend/.env
+      - run:
+          name: Backend smoke test.
+          command: |
+            # your code here
+      - run:
+          name: Frontend smoke test.
+          command: |
+            # your code here
+      # Here's where you will add some code to rollback on failure
 #
 #  cloudfront-update:
 #    docker:
@@ -468,8 +481,8 @@ workflows:
           requires: [run-migrations]
       - deploy-backend:
           requires: [run-migrations]
-#      - smoke-test:
-#          requires: [deploy-backend, deploy-frontend]
+      - smoke-test:
+          requires: [deploy-backend, deploy-frontend]
 #      - cloudfront-update:
 #          requires: [smoke-test]
 #      - cleanup:
