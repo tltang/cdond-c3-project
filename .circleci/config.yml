@@ -57,8 +57,6 @@ jobs:
       - run:
           name: Build front-end
           command: |
-            # Your code here
-            # exit 1
             cd frontend
             npm install
             npm run build
@@ -76,8 +74,6 @@ jobs:
       - run:
           name: Back-end build
           command: |
-            # Your code here
-            # exit 1
             cd backend
             npm install
             npm run build
@@ -93,12 +89,10 @@ jobs:
       - checkout
       # Restore from cache
       - restore_cache:
-          keys: [frontend-test]
+          keys: [frontend-build]
       - run:
           name: front-end test
           command: |
-            # Your code here
-            # exit 1
             cd frontend
             npm install
             npm run test
@@ -114,12 +108,10 @@ jobs:
       - checkout
       # Restore from cache
       - restore_cache:
-          keys: [backend-test]
+          keys: [backend-build]
       - run:
           name: back-end test
           command: |
-            # Your code here
-            # exit 1
             cd backend
             npm install
             npm run test
@@ -135,12 +127,10 @@ jobs:
       - checkout
       # Restore from cache
       - restore_cache:
-          keys: [frontend-scan]
+          keys: [frontend-build]
       - run:
           name: front-end scan
           command: |
-            # Your code here
-            # exit 1
             cd frontend
             npm install
             npm audit fix --audit-level=critical
@@ -158,12 +148,10 @@ jobs:
       - checkout
       # Restore from cache
       - restore_cache:
-          keys: [backend-scan]
+          keys: [backend-build]
       - run:
           name: back-end scan
           command: |
-            # Your code here
-            # exit 1
             cd backend
             npm install
             npm audit fix --audit-level=critical
@@ -215,7 +203,6 @@ jobs:
   configure-infrastructure:
     docker:
       # Docker image here that supports Ansible
-      #- image: python:3.7-alpine3.11
       - image: cimg/node:13.8.0
     steps:
       # Checkout code from git
@@ -224,7 +211,7 @@ jobs:
       - add_ssh_keys:
           # You can get this ID in the section where you registered the SSH Key
           fingerprints: ["9b:80:74:3d:eb:a1:02:05:5d:e4:51:d2:74:d2:e9:9c"]
-      # attach workspace
+
       - attach_workspace:
           at: ~/
       - install_awscli
@@ -238,7 +225,6 @@ jobs:
       - run:
           name: Configure server
           command: |
-            # Your code here
             cd .circleci/ansible
             ansible-playbook -i inventory.txt configure-server.yml
       - persist_to_workspace:
@@ -266,7 +252,6 @@ jobs:
       - run:
           name: Send migration results to kvdb.io #memstash website not working
           command: |
-            # Your code here
             if grep -q "migrations" ~/project/backend/migrations_dump.txt
             then
               curl --insecure https://kvdb.io/2mRbmYXyt9prv8MBeAmykd/migration_$CIRCLE_WORKFLOW_ID -d '1'
@@ -303,14 +288,13 @@ jobs:
       - run:
           name: Get backend url
           command: |
-            # your code here
             export BACKEND_IP=$(aws ec2 describe-instances \
                --filters Name=tag-value,Values="backend-${CIRCLE_WORKFLOW_ID}" \
                --query 'Reservations[*].Instances[*].PublicIpAddress' \
                --output text)            
             export API_URL="http://${BACKEND_IP}:3030"
-            echo "${API_URL}"
-            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+            echo "API_URL = ${API_URL}"
+            echo "API_URL=http://${BACKEND_IP}:3030" >> frontend/.env
             cat frontend/.env
 
       - persist_to_workspace:
@@ -321,7 +305,6 @@ jobs:
       - run:
           name: Deploy frontend objects
           command: |
-            # your code here
             cd frontend
             npm install
             npm run build
@@ -335,7 +318,6 @@ jobs:
       # Docker image here that supports Ansible
       - image: cimg/node:13.8.0
     steps:
-      # Checkout code from git
       - checkout
       # Add ssh keys with fingerprint
       - add_ssh_keys:
@@ -364,7 +346,6 @@ jobs:
       - run:
           name: Deploy backend
           command: |
-            # your code here
             cd backend
             touch .env
             echo ENVIRONMENT=production > ".env"
@@ -403,11 +384,22 @@ jobs:
     docker:
       - image: cimg/node:13.8.0
     steps:
-      # Checkout code from git
       - checkout
       - install_awscli
       - attach_workspace:
           at: ~/
+      - run:
+          name: Frontend smoke test.
+          command: |
+            # your code here
+            URL="http://udapeople-$CIRCLE_WORKFLOW_ID.s3-website-us-east-1.amazonaws.com/#/employees"            
+            echo ${URL} 
+            if curl -s ${URL} | grep "Welcome"
+            then
+              exit 0
+            else
+              exit 1
+            fi
       - run:
           name: Backend smoke test.
           command: |
@@ -420,24 +412,11 @@ jobs:
                --output text)            
             export API_URL="http://${BACKEND_IP}:3030/api/status"
             echo "$API_URL"
-            echo curl -s ${API_URL} 
             if curl -s ${API_URL} | grep "ok"
             then
                 exit 0
             else
-                exit 0
-            fi
-      - run:
-          name: Frontend smoke test.
-          command: |
-            # your code here
-            URL="http://udapeople-$CIRCLE_WORKFLOW_ID.s3-website-us-east-1.amazonaws.com/#/employees"            
-            echo ${URL} 
-            if curl -s ${URL} | grep "Welcome"
-            then
-              exit 0
-            else
-              exit 1
+                exit 1
             fi
       - destroy_environment
       - revert-migrations
@@ -454,11 +433,11 @@ jobs:
       - run:
           name: Save Old Workflow ID to kvdb.io
           command: |
-            export OLD_WORKFLOW_ID=$(aws cloudformation \
+            export OldWorkflowID=$(aws cloudformation \
                       list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
                       --no-paginate --output text)
-            echo "Old Wokflow ID: $OLD_WORKFLOW_ID"
-            curl https://kvdb.io/2mRbmYXyt9prv8MBeAmykd/old_workflow_id -d "${OLD_WORKFLOW_ID}"
+            echo "Old Wokflow ID: $OldWorkflowID"
+            curl https://kvdb.io/2mRbmYXyt9prv8MBeAmykd/old_workflow_id -d "${OldWorkflowID}"
       - run:
           name: Update cloudfront distribution
           command: |
@@ -500,6 +479,36 @@ jobs:
               echo "=======================Didn't delete========================"            
             fi
 
+  add-prometheus-node-exporter:
+    docker:
+      - image: cimg/node:13.8.0
+    steps:
+      - checkout
+      - install_awscli
+      - install_ansible
+
+      - add_ssh_keys:
+          fingerprints: ["9b:80:74:3d:eb:a1:02:05:5d:e4:51:d2:74:d2:e9:9c"]
+
+      - attach_workspace:
+          at: ~/
+
+      - restore_cache:
+          keys: [backend-build]
+
+      - run:
+          name: Setup Prometheus Node Exporter
+          command: | 
+            cd .circleci/ansible
+            cat inventory.txt
+            ansible-playbook -i inventory.txt node-exporter.yml
+
+      - destroy_environment
+
+      - revert-migrations
+
+
+
 workflows:
   default:
     jobs:
@@ -531,5 +540,8 @@ workflows:
           requires: [deploy-backend, deploy-frontend]
       - cloudfront-update:
           requires: [smoke-test]
-      - cleanup:
-          requires: [cloudfront-update]
+      - add-prometheus-node-exporter:
+          requires: [smoke-test]
+      # Comment out the next 2 lines if you want to persist your infrastructure
+      #- cleanup:
+      #    requires: [cloudfront-update]
