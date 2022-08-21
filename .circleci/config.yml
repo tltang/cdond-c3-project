@@ -476,7 +476,7 @@ jobs:
       - checkout
       - install_awscli
       - run:
-          name: Get old stack workflow id
+          name: Get old stack workflow id and Cleanup
           command: |
             # your code here
           
@@ -492,12 +492,13 @@ jobs:
             echo Stack names: "${STACKS[@]}"
             if [[ ${STACKS[@]} =~ "${OldWorkflowID}" ]]
             then
-               echo "=======================Delete Confirmed========================"
+              aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
+              aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
+              aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
+              echo "=======================Delete Confirmed========================"
+            else
+              echo "=======================Didn't delete========================"            
             fi
-
-# aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
-# aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
-# aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
 
 workflows:
   default:
@@ -516,7 +517,8 @@ workflows:
           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
 #          filters:
 #            branches:
-#              only: [test-feature-branch]
+#              only:
+#                - main
       - configure-infrastructure:
           requires: [deploy-infrastructure]
       - run-migrations:
