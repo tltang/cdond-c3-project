@@ -310,6 +310,11 @@ jobs:
             echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
             cat frontend/.env
 
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/frontend/.env
+
       - run:
           name: Deploy frontend objects
           command: |
@@ -397,7 +402,9 @@ jobs:
           name: Install dependencies
           command: |
             # your code here
+            echo ${BACKEND_IP} 
             cat frontend/.env
+            exit 1
 #      - run:
 #          name: Get backend url
 #          command: |
@@ -418,7 +425,7 @@ jobs:
           name: Frontend smoke test.
           command: |
             # your code here
-      # Here's where you will add some code to rollback on failure
+      - destroy_environment
 #
 #  cloudfront-update:
 #    docker:
