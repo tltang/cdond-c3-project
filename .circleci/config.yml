@@ -416,9 +416,8 @@ jobs:
                 echo "success"
                 exit 0
             else
-                echo "curl -s ${API_URL}"
                 echo "fail"
-                exit 0
+                exit 1
             fi
       - destroy_environment
       - revert-migrations
@@ -485,18 +484,27 @@ jobs:
     docker:
       - image: cimg/node:13.8.0
     steps:
+      # Checkout code from git
       - checkout
-      - install_awscli
-      - install_ansible
-
+      # Add ssh keys with fingerprint
       - add_ssh_keys:
+          # You can get this ID in the section where you registered the SSH Key
           fingerprints: ["9b:80:74:3d:eb:a1:02:05:5d:e4:51:d2:74:d2:e9:9c"]
 
       - attach_workspace:
           at: ~/
 
+      - install_awscli
+      - install_ansible
+
       - restore_cache:
           keys: [backend-build]
+      - run:
+          name: Install Dependencies
+          command: |
+            cd backend
+            npm install
+            npm run build
 
       - run:
           name: Setup Prometheus Node Exporter
