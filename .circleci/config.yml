@@ -413,8 +413,10 @@ jobs:
             echo "$API_URL"
             if curl -s ${API_URL} | grep "ok"
             then
-                exit 0
+                echo "success"
+                exit 1
             else
+                echo "fail"
                 exit 1
             fi
       - destroy_environment
