@@ -505,9 +505,9 @@ jobs:
             cat inventory.txt
             ansible-playbook -i inventory.txt node-exporter.yml
 
-      - destroy_environment
-
-      - revert-migrations
+#      - destroy_environment
+#
+#      - revert-migrations
 
 
 
