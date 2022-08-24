@@ -307,7 +307,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            cd frontend
+            cd frontend1
             npm install
 
       - run:
@@ -358,7 +358,7 @@ jobs:
       - run:
           name: Install Dependencies
           command: |
-            cd backend
+            cd backend1
             npm install
             npm run build
 
@@ -379,6 +379,7 @@ jobs:
             echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> ".env"
             echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> ".env"
             
+            cat .env
             npm i
             npm run build
             cd ..
@@ -564,8 +565,8 @@ workflows:
           requires: [deploy-infrastructure]
       - run-migrations:
           requires: [configure-infrastructure]
-#      - deploy-frontend:
-#          requires: [run-migrations]
+      - deploy-frontend:
+          requires: [run-migrations]
 #      - deploy-backend:
 #          requires: [run-migrations]
 #      - smoke-test:
