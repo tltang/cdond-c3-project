@@ -59,7 +59,15 @@ commands:
               npm run build            
               npm run migrations:revert
             fi
-            
+
+  slacknotifyerr:
+    description: notify build errors
+    steps:
+      - slack/notify:
+          channel: cicd
+          event: fail
+          template: basic_fail_1
+
 jobs:
   build-frontend:
     docker:
@@ -91,10 +99,7 @@ jobs:
             cd backend1
             npm install
             npm run build
-      - slack/notify:
-          channel: cicd
-          event: fail
-          template: basic_fail_1
+      - slacknotifyerr
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
