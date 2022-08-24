@@ -117,7 +117,7 @@ jobs:
       - run:
           name: front-end test
           command: |
-            cd frontend1
+            cd frontend
             npm install
             npm run test
       - slacknotifyerr
@@ -137,7 +137,7 @@ jobs:
       - run:
           name: back-end test
           command: |
-            cd backend1
+            cd backend
             npm install
             npm run test
       - slacknotifyerr
@@ -157,7 +157,7 @@ jobs:
       - run:
           name: front-end scan
           command: |
-            cd frontend
+            cd frontend1
             npm install
             npm audit fix --audit-level=critical
             npm audit fix --audit-level=critical --force            
@@ -179,7 +179,7 @@ jobs:
       - run:
           name: back-end scan
           command: |
-            cd backend
+            cd backend1
             npm install
             npm audit fix --audit-level=critical
             npm audit fix --audit-level=critical --force            
