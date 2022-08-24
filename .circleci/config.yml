@@ -120,6 +120,7 @@ jobs:
             cd frontend
             npm install
             npm run test
+      - slacknotifyerr
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-test
@@ -139,6 +140,7 @@ jobs:
             cd backend
             npm install
             npm run test
+      - slacknotifyerr
       - save_cache:
           paths: [backend/node_modules]
           key: backend-test
@@ -160,6 +162,7 @@ jobs:
             npm audit fix --audit-level=critical
             npm audit fix --audit-level=critical --force            
             npm audit --audit-level=critical
+      - slacknotifyerr
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-scan
@@ -181,6 +184,7 @@ jobs:
             npm audit fix --audit-level=critical
             npm audit fix --audit-level=critical --force            
             npm audit --audit-level=critical
+      - slacknotifyerr
       - save_cache:
           paths: [backend/node_modules]
           key: backend-scan
