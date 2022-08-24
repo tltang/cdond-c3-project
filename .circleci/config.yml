@@ -157,7 +157,7 @@ jobs:
       - run:
           name: front-end scan
           command: |
-            cd frontend1
+            cd frontend
             npm install
             npm audit fix --audit-level=critical
             npm audit fix --audit-level=critical --force            
@@ -179,7 +179,7 @@ jobs:
       - run:
           name: back-end scan
           command: |
-            cd backend1
+            cd backend
             npm install
             npm audit fix --audit-level=critical
             npm audit fix --audit-level=critical --force            
@@ -219,12 +219,13 @@ jobs:
             aws ec2 describe-instances \
                --filters Name=tag-value,Values="backend-${CIRCLE_WORKFLOW_ID}" \
                --query 'Reservations[*].Instances[*].PublicIpAddress' \
-               --output text >> .circleci/ansible/inventory.txt
+               --output text >> .circleci1/ansible/inventory.txt
             cat .circleci/ansible/inventory.txt
       - persist_to_workspace:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
+      - slacknotifyerr
       - destroy_environment
 
 
@@ -551,12 +552,12 @@ workflows:
           requires: [build-backend]
       - scan-frontend:
           requires: [build-frontend]
-#      - deploy-infrastructure:
-#          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-#          filters:
-#            branches:
-#              only:
-#                - master
+      - deploy-infrastructure:
+          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          filters:
+            branches:
+              only:
+                - master
 #      - configure-infrastructure:
 #          requires: [deploy-infrastructure]
 #      - run-migrations:
