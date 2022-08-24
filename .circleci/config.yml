@@ -335,6 +335,7 @@ jobs:
             npm run build
             tar -czvf artifact-"$CIRCLE_WORKFLOW_ID".tar.gz dist
             aws s3 cp dist s3://udapeople-$CIRCLE_WORKFLOW_ID --recursive
+      - slacknotifyerr
       - destroy_environment
       - revert-migrations
 
@@ -397,6 +398,7 @@ jobs:
           paths:
             - project/backend/.env
 
+      - slacknotifyerr
       - destroy_environment
       - revert-migrations
 
@@ -567,8 +569,8 @@ workflows:
           requires: [configure-infrastructure]
       - deploy-frontend:
           requires: [run-migrations]
-#      - deploy-backend:
-#          requires: [run-migrations]
+      - deploy-backend:
+          requires: [run-migrations]
 #      - smoke-test:
 #          requires: [deploy-backend, deploy-frontend]
 #      - cloudfront-update:
