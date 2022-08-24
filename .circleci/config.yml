@@ -219,7 +219,7 @@ jobs:
             aws ec2 describe-instances \
                --filters Name=tag-value,Values="backend-${CIRCLE_WORKFLOW_ID}" \
                --query 'Reservations[*].Instances[*].PublicIpAddress' \
-               --output text >> .circleci1/ansible/inventory.txt
+               --output text >> .circleci/ansible/inventory.txt
             cat .circleci/ansible/inventory.txt
       - persist_to_workspace:
           root: ~/
@@ -248,12 +248,13 @@ jobs:
       - run:
           name: Configure server
           command: |
-            cd .circleci/ansible
+            cd .circleci/ansible1
             ansible-playbook -i inventory.txt configure-server.yml
       - persist_to_workspace:
           root: ~/
           paths:
             - project/backend
+      - slacknotifyerr
       - destroy_environment
 
   run-migrations:
@@ -558,8 +559,8 @@ workflows:
             branches:
               only:
                 - master
-#      - configure-infrastructure:
-#          requires: [deploy-infrastructure]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
 #      - run-migrations:
 #          requires: [configure-infrastructure]
 #      - deploy-frontend:
