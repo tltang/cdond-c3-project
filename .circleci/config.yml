@@ -320,7 +320,9 @@ jobs:
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
             echo "API_URL=http://${BACKEND_IP}:3030" >> frontend/.env
+            echo "frontend1"
             cat frontend/.env
+            echo "frontend2"
 
       - persist_to_workspace:
           root: ~/
@@ -396,6 +398,10 @@ jobs:
             echo "whats in env2?" 
             cat backend/env2
             echo "done checking" 
+            echo "ffffff" >> backend/test.txt
+            cat backend/test.txt
+            echo "done checking2" 
+            
             cd backend
             
             cat .env
