@@ -381,30 +381,10 @@ jobs:
             echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> backend/.env
             echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> backend/.env
 
-            echo ENVIRONMENT=production >> backend/env2
-            echo TYPEORM_CONNECTION=postgres >> backend/env2
-            echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> backend/env2
-            echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> backend/env2
-            echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> backend/env2
-            echo NODE_ENV=production >> backend/env2
-            echo TYPEORM_HOST=$TYPEORM_HOST >> backend/env2
-            echo TYPEORM_PORT=$TYPEORM_PORT >> backend/env2
-            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> backend/env2
-            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> backend/env2
-            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> backend/env2
-
-            echo "whats in .env?" 
             cat backend/.env
-            echo "whats in env2?" 
-            cat backend/env2
-            echo "done checking" 
-            echo "ffffff" >> backend/test.txt
-            cat backend/test.txt
-            echo "done checking2" 
-            
+             
             cd backend
             
-            cat .env
             npm i
             npm run build
             cd ..
