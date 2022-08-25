@@ -313,17 +313,22 @@ jobs:
       - run:
           name: Get backend url
           command: |
+            export API_URL="http://3.95.136.73:3030"
+            echo "API_URL = ${API_URL}"
+            echo "API_URL=http://3.95.136.73:3030" >> frontend/.env
+            echo "frontend1"
+            cat frontend/.env
+            echo "frontend2"
 #            export BACKEND_IP=$(aws ec2 describe-instances \
 #               --filters Name=tag-value,Values="backend-${CIRCLE_WORKFLOW_ID}" \
 #               --query 'Reservations[*].Instances[*].PublicIpAddress' \
 #               --output text)
-            BACKEND_IP=3.95.136.73 
-            export API_URL="http://${BACKEND_IP}:3030"
-            echo "API_URL = ${API_URL}"
-            echo "API_URL=http://${BACKEND_IP}:3030" >> frontend/.env
-            echo "frontend1"
-            cat frontend/.env
-            echo "frontend2"
+#            export API_URL="http://${BACKEND_IP}:3030"
+#            echo "API_URL = ${API_URL}"
+#            echo "API_URL=http://${BACKEND_IP}:3030" >> frontend/.env
+#            echo "frontend1"
+#            cat frontend/.env
+#            echo "frontend2"
 
       - persist_to_workspace:
           root: ~/
