@@ -109,7 +109,9 @@ jobs:
     docker:
       - image: circleci/node:13.8.0
     steps:
+      # Checkout code from git
       - checkout
+      # Restore from cache
       - restore_cache:
           keys: [frontend-build]
       - run:
@@ -127,7 +129,9 @@ jobs:
     docker:
       - image: circleci/node:13.8.0
     steps:
+      # Checkout code from git
       - checkout
+      # Restore from cache
       - restore_cache:
           keys: [backend-build]
       - run:
@@ -189,6 +193,7 @@ jobs:
     docker:
       - image: amazon/aws-cli
     steps:
+      # Checkout code from git
       - checkout
       - run: yum install -y tar gzip
       - run:
@@ -226,8 +231,10 @@ jobs:
 
   configure-infrastructure:
     docker:
+      # Docker image here that supports Ansible
       - image: cimg/node:13.8.0
     steps:
+      # Checkout code from git
       - checkout
       # Add ssh keys with fingerprint
       - add_ssh_keys:
@@ -254,11 +261,13 @@ jobs:
     docker:
       - image: cimg/node:13.8.0
     steps:
+      # Checkout code from git
       - checkout
       - install_awscli
       - run:
           name: Run migrations
           command: |
+            # Your code here
             cd backend
             npm install
             # Run and save the migration output
@@ -279,6 +288,7 @@ jobs:
       # Docker image here that supports AWS CLI
       - image: cimg/node:13.8.0
     steps:
+      # Checkout code from git
       - checkout
       - install_awscli
       - run:
@@ -347,7 +357,7 @@ jobs:
       - add_ssh_keys:
           # You can get this ID in the section where you registered the SSH Key
           fingerprints: ["9b:80:74:3d:eb:a1:02:05:5d:e4:51:d2:74:d2:e9:9c"]
-
+      # attach workspace
       - attach_workspace:
           at: ~/
       - install_awscli
@@ -392,7 +402,6 @@ jobs:
 
   smoke-test:
     docker:
-      # Lightweight Docker image
       - image: cimg/node:13.8.0
     steps:
       - checkout
@@ -423,13 +432,13 @@ jobs:
                --output text)            
             export API_URL="http://${BACKEND_IP}:3030/api/status"
             echo "$API_URL"
-            if curl --retry 5 --retry-max-time 300 -s ${API_URL} | grep "ok"
+            if curl -s ${API_URL} | grep "ok"
             then
                 echo "success"
                 exit 0
             else
                 echo "fail"
-                exit 0
+                exit 1
             fi
       - slacknotifyerr
       - destroy_environment
@@ -440,8 +449,10 @@ jobs:
     docker:
       - image: cimg/node:13.8.0
     steps:
+      # Checkout code from git
       - checkout
       - install_awscli
+      # Docker image here that supports AWS CLI
       - run:
           name: Save Old Workflow ID to kvdb.io
           command: |
@@ -470,8 +481,11 @@ jobs:
       - run:
           name: Get old stack workflow id and Cleanup
           command: |
-            
-            export OldWorkflowID=$(curl --insecure https://kvdb.io/2mRbmYXyt9prv8MBeAmykd/old_workflow_id)
+            # your code here
+          
+            export OldWorkflowID=$(aws cloudformation \
+                    list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
+                    --no-paginate --output text)
             
             export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
                     --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
@@ -494,6 +508,7 @@ jobs:
     docker:
       - image: cimg/node:13.8.0
     steps:
+      # Checkout code from git
       - checkout
       # Add ssh keys with fingerprint
       - add_ssh_keys:
@@ -532,7 +547,9 @@ workflows:
   default:
     jobs:
       - build-frontend
+#        context: slack-secrets
       - build-backend
+#        context: slack-secrets
       - test-frontend:
           requires: [build-frontend]
       - test-backend:
@@ -561,6 +578,6 @@ workflows:
           requires: [smoke-test]
 #      - add-prometheus-node-exporter:
 #          requires: [smoke-test]
-#       Comment out the next 2 lines if you want to persist your infrastructure
-      - cleanup:
-          requires: [cloudfront-update]
+      # Comment out the next 2 lines if you want to persist your infrastructure
+      #- cleanup:
+      #    requires: [cloudfront-update]
