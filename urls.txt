@@ -1,7 +1,7 @@
   1. Public Url to GitHub repository (not private) [URL01] - https://github.com/tltang/cdond-c3-project
   1. Public URL for your S3 Bucket (aka, your green candidate front-end) [URL02]
       - http://44.204.39.23:3030/
-      - https://s3.console.aws.amazon.com/s3/buckets/udapeople-43a62ce9-42ee-464d-a3bd-edb312cd78c5?region=us-east-1&tab=objects
+      - https://s3.console.aws.amazon.com/s3/buckets/udapeople-20a52d51-143c-4958-b852-3297e5363734?region=us-east-1&tab=objects
   1. Public URL for your CloudFront distribution (aka, your blue production front-end) [URL03] - d36hopjd48shit.cloudfront.net
   1. Public URLs to deployed application back-end in EC2 [URL04] - http://3.80.207.75:3030/api/status
   1. Public URL to your Prometheus Server [URL05]
