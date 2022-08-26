@@ -375,7 +375,7 @@ jobs:
           name: Deploy backend
           command: |
 
-            cat backend/.env
+#            cat backend/.env
              
             cd backend
             
