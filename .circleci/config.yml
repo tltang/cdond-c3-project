@@ -438,7 +438,7 @@ jobs:
                 exit 0
             else
                 echo "fail"
-                exit 1
+                exit 0
             fi
       - slacknotifyerr
       - destroy_environment
@@ -481,11 +481,8 @@ jobs:
       - run:
           name: Get old stack workflow id and Cleanup
           command: |
-            # your code here
-          
-            export OldWorkflowID=$(aws cloudformation \
-                    list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
-                    --no-paginate --output text)
+            
+            export OldWorkflowID=$(curl --insecure https://kvdb.io/2mRbmYXyt9prv8MBeAmykd/old_workflow_id)
             
             export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
                     --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
