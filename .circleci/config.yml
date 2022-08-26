@@ -382,11 +382,6 @@ jobs:
 
             ansible-playbook -i inventory.txt deploy-backend.yml
 
-#      - persist_to_workspace:
-#          root: ~/
-#          paths:
-#            - project/backend/.env
-
       - slacknotifyerr
       - destroy_environment
       - revert-migrations
@@ -407,7 +402,7 @@ jobs:
             echo ${URL} 
             if curl -s ${URL} | grep "Welcome"
             then
-              exit 0
+              exit 1
             else
               exit 1
             fi
